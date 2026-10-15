@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+    <title>Rounding Kick</title>
+    <style>
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background: #10141c;
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        padding:
+          env(safe-area-inset-top)
+          env(safe-area-inset-right)
+          env(safe-area-inset-bottom)
+          env(safe-area-inset-left);
+      }
+      #stage {
+        position: relative;
+        aspect-ratio: 9 / 16;
+        width: min(100%, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 9 / 16));
+        height: min(100%, calc((100vw - env(safe-area-inset-left) - env(safe-area-inset-right)) * 16 / 9));
+        max-width: 100%;
+        max-height: 100%;
+        background: #000;
+        touch-action: none;
+      }
+      #unity-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        background: #000;
+        touch-action: none;
+      }
+      #rk-loading {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        color: #f4efe4;
+        font-family: "Segoe UI", sans-serif;
+        background: #10141c;
+        pointer-events: none;
+      }
+      #rk-loading h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+      #rk-bar {
+        width: 62%;
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.16);
+        overflow: hidden;
+      }
+      #rk-bar > div {
+        height: 100%;
+        width: 0%;
+        background: #e8c56b;
+      }
+      #rk-pct, #rk-how {
+        margin: 0;
+        font-size: 14px;
+        opacity: 0.85;
+      }
+      #rk-build {
+        position: fixed;
+        left: calc(8px + env(safe-area-inset-left));
+        bottom: calc(8px + env(safe-area-inset-bottom));
+        margin: 0;
+        max-width: 70vw;
+        color: #c8c2b4;
+        font: 12px/1.3 "Segoe UI", sans-serif;
+        z-index: 2;
+        pointer-events: none;
+      }
+      #rk-restart {
+        position: fixed;
+        top: calc(8px + env(safe-area-inset-top));
+        right: calc(8px + env(safe-area-inset-right));
+        z-index: 3;
+        margin: 0;
+        padding: 6px 10px;
+        border: 0;
+        border-radius: 8px;
+        background: rgba(16, 20, 28, 0.72);
+        color: #f4efe4;
+        font: 13px/1 "Segoe UI", sans-serif;
+        touch-action: manipulation;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <canvas id="unity-canvas" width="1080" height="1920" tabindex="-1"></canvas>
+      <div id="rk-loading">
+        <h1>Rounding Kick</h1>
+        <div id="rk-bar"><div id="rk-fill"></div></div>
+        <div id="rk-pct">Loading 0%</div>
+        <p id="rk-how">Drag the ball and release.</p>
+      </div>
+    </div>
+    <p id="rk-build">Drag the ball and release. angle-20261015-2352</p>
+    <button id="rk-restart" type="button">Restart</button>
+    <script src="Build/angle-20261015-2352.loader.js?v=angle-20261015-2352"></script>
+    <script>
+      (function () {
+        var stage = document.getElementById("stage");
+        function block(event) {
+          if (stage.contains(event.target)) event.preventDefault();
+        }
+        document.addEventListener("touchmove", block, { passive: false });
+        document.addEventListener("wheel", block, { passive: false });
+        stage.addEventListener("gesturestart", block, { passive: false });
+        document.getElementById("rk-restart").addEventListener("click", function () {
+          window.location.reload();
+        });
+
+        var started = performance.now();
+        var canvas = document.querySelector("#unity-canvas");
+        createUnityInstance(canvas, {
+          arguments: [],
+          dataUrl: "Build/angle-20261015-2352.data.unityweb?v=angle-20261015-2352",
+          frameworkUrl: "Build/angle-20261015-2352.framework.js.unityweb?v=angle-20261015-2352",
+          codeUrl: "Build/angle-20261015-2352.wasm.unityweb?v=angle-20261015-2352",
+          streamingAssetsUrl: "StreamingAssets",
+          companyName: "DefaultCompany",
+          productName: "Rounding Kick",
+          productVersion: "0.1.0",
+          devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2)
+        }, function (progress) {
+          var pct = Math.round(progress * 100);
+          document.getElementById("rk-fill").style.width = pct + "%";
+          document.getElementById("rk-pct").textContent = "Loading " + pct + "%";
+        }).then(function (unityInstance) {
+          document.getElementById("rk-loading").style.display = "none";
+          window.rkUnity = unityInstance;
+          window.rkLoadMs = Math.round(performance.now() - started);
+        }).catch(function (message) {
+          document.getElementById("rk-pct").textContent = String(message);
+        });
+      })();
+    </script>
+  </body>
+</html>
