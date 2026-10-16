@@ -90,7 +90,7 @@
       }
       #rk-restart {
         position: fixed;
-        top: calc(8px + env(safe-area-inset-top));
+        bottom: calc(8px + env(safe-area-inset-bottom));
         right: calc(8px + env(safe-area-inset-right));
         z-index: 3;
         margin: 0;
@@ -114,9 +114,9 @@
         <p id="rk-how">Drag the ball and release.</p>
       </div>
     </div>
-    <p id="rk-build">Drag the ball and release. angle-20261016-2208</p>
-    <button id="rk-restart" type="button">Restart</button>
-    <script src="Build/angle-20261016-2208.loader.js?v=angle-20261016-2208"></script>
+    <p id="rk-build">Drag the ball and release. angle-20261016-2308</p>
+    <button id="rk-restart" type="button">Reload</button>
+    <script src="Build/angle-20261016-2308.loader.js?v=angle-20261016-2308"></script>
     <script>
       (function () {
         var stage = document.getElementById("stage");
@@ -134,9 +134,9 @@
         var canvas = document.querySelector("#unity-canvas");
         createUnityInstance(canvas, {
           arguments: [],
-          dataUrl: "Build/angle-20261016-2208.data.unityweb?v=angle-20261016-2208",
-          frameworkUrl: "Build/angle-20261016-2208.framework.js.unityweb?v=angle-20261016-2208",
-          codeUrl: "Build/angle-20261016-2208.wasm.unityweb?v=angle-20261016-2208",
+          dataUrl: "Build/angle-20261016-2308.data.unityweb?v=angle-20261016-2308",
+          frameworkUrl: "Build/angle-20261016-2308.framework.js.unityweb?v=angle-20261016-2308",
+          codeUrl: "Build/angle-20261016-2308.wasm.unityweb?v=angle-20261016-2308",
           streamingAssetsUrl: "StreamingAssets",
           companyName: "DefaultCompany",
           productName: "Rounding Kick",
