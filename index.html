@@ -42,9 +42,6 @@
         background: #0340CE;
         touch-action: none;
       }
-      #unity-canvas.rk-pending {
-        visibility: hidden;
-      }
       #rk-loading {
         position: absolute;
         inset: 0;
@@ -58,6 +55,11 @@
       }
       #rk-loading.rk-hide {
         opacity: 0;
+        pointer-events: none;
+      }
+      #rk-loading[hidden] {
+        display: none !important;
+        pointer-events: none;
       }
       #rk-art {
         display: block;
@@ -178,7 +180,7 @@
   </head>
   <body>
     <div id="stage">
-      <canvas id="unity-canvas" class="rk-pending" width="1080" height="1920" tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width="1080" height="1920" tabindex="-1"></canvas>
       <div id="rk-loading" role="status" aria-live="polite" aria-busy="true">
         <img id="rk-art" src="TemplateData/rk-loading-art.jpg?v=angle-20261017-0034" alt="Rounding Kick">
         <div id="rk-load-ui">
@@ -261,7 +263,6 @@
         function reveal(unityInstance) {
           window.rkUnity = unityInstance;
           document.body.classList.add("rk-ready");
-          canvas.classList.remove("rk-pending");
           loading.setAttribute("aria-busy", "false");
           loading.classList.add("rk-hide");
           window.setTimeout(function () {
