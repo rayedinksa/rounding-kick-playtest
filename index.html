@@ -4,12 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
     <title>Rounding Kick</title>
+    <link rel="preload" as="image" href="TemplateData/rk-loading-art.jpg?v=angle-20261017-0034">
     <style>
       html, body {
         margin: 0;
         width: 100%;
         height: 100%;
-        background: #10141c;
+        background: #0340CE;
         overflow: hidden;
         overscroll-behavior: none;
       }
@@ -31,51 +32,118 @@
         height: min(100%, calc((100vw - env(safe-area-inset-left) - env(safe-area-inset-right)) * 16 / 9));
         max-width: 100%;
         max-height: 100%;
-        background: #000;
+        background: #0340CE;
         touch-action: none;
       }
       #unity-canvas {
         width: 100%;
         height: 100%;
         display: block;
-        background: #000;
+        background: #0340CE;
         touch-action: none;
+      }
+      #unity-canvas.rk-pending {
+        visibility: hidden;
       }
       #rk-loading {
         position: absolute;
         inset: 0;
+        z-index: 4;
+        display: flex;
+        flex-direction: column;
+        background: #ABC2D4;
+        overflow: hidden;
+        opacity: 1;
+        transition: opacity 0.45s ease;
+      }
+      #rk-loading.rk-hide {
+        opacity: 0;
+      }
+      #rk-art {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 89%;
+        object-fit: contain;
+        object-position: center bottom;
+        flex: 0 1 auto;
+        background: #0340CE;
+      }
+      #rk-loading.rk-failed #rk-art {
+        max-height: 74%;
+      }
+      #rk-load-ui {
+        flex: 1 1 auto;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 14px;
-        color: #f4efe4;
-        font-family: "Segoe UI", sans-serif;
-        background: #10141c;
-        pointer-events: none;
+        gap: 0.65em;
+        min-height: 11%;
+        padding: 0 8% 2.2%;
+        box-sizing: border-box;
+        background: #ABC2D4;
+        color: #C9A24A;
+        font-family: "Segoe UI", "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
       }
-      #rk-loading h1 {
+      #rk-status, #rk-studio, #rk-error {
         margin: 0;
-        font-size: 22px;
+      }
+      #rk-status {
+        font-size: clamp(16px, 2.5vh, 22px);
         font-weight: 600;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.01em;
       }
       #rk-bar {
-        width: 62%;
-        height: 8px;
-        border-radius: 4px;
-        background: rgba(255, 255, 255, 0.16);
-        overflow: hidden;
+        width: 40%;
+        min-width: 140px;
+        height: 14px;
+        box-sizing: border-box;
+        padding: 2px;
+        border-radius: 999px;
+        background: #C9A24A;
       }
-      #rk-bar > div {
+      #rk-track {
         height: 100%;
-        width: 0%;
-        background: #e8c56b;
+        border-radius: inherit;
+        overflow: hidden;
+        background: #D7E7F0;
       }
-      #rk-pct, #rk-how {
-        margin: 0;
-        font-size: 14px;
-        opacity: 0.85;
+      #rk-fill {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: #7EFEFC;
+      }
+      #rk-bar.rk-wait #rk-fill {
+        width: 28%;
+        animation: rk-indet 1.05s ease-in-out infinite;
+      }
+      @keyframes rk-indet {
+        0% { transform: translateX(-140%); }
+        100% { transform: translateX(400%); }
+      }
+      #rk-studio {
+        font-size: clamp(11px, 1.55vh, 14px);
+        font-weight: 600;
+        letter-spacing: 0.26em;
+      }
+      #rk-error {
+        max-width: 18em;
+        color: #1C3358;
+        font-size: 13px;
+        line-height: 1.35;
+        text-align: center;
+      }
+      #rk-retry {
+        border: 0;
+        border-radius: 999px;
+        min-height: 44px;
+        padding: 0 18px;
+        background: #123A9A;
+        color: #F4EFE4;
+        font: 600 15px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        touch-action: manipulation;
       }
       #rk-build {
         position: fixed;
@@ -87,6 +155,10 @@
         font: 12px/1.3 "Segoe UI", sans-serif;
         z-index: 2;
         pointer-events: none;
+      }
+      body:not(.rk-ready) #rk-build,
+      body:not(.rk-ready) #rk-restart {
+        visibility: hidden;
       }
       #rk-restart {
         position: fixed;
@@ -106,12 +178,18 @@
   </head>
   <body>
     <div id="stage">
-      <canvas id="unity-canvas" width="1080" height="1920" tabindex="-1"></canvas>
-      <div id="rk-loading">
-        <h1>Rounding Kick</h1>
-        <div id="rk-bar"><div id="rk-fill"></div></div>
-        <div id="rk-pct">Loading 0%</div>
-        <p id="rk-how">Drag the ball and release.</p>
+      <canvas id="unity-canvas" class="rk-pending" width="1080" height="1920" tabindex="-1"></canvas>
+      <div id="rk-loading" role="status" aria-live="polite" aria-busy="true">
+        <img id="rk-art" src="TemplateData/rk-loading-art.jpg?v=angle-20261017-0034" alt="Rounding Kick">
+        <div id="rk-load-ui">
+          <p id="rk-status">Loading…</p>
+          <div id="rk-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Loading">
+            <div id="rk-track"><div id="rk-fill"></div></div>
+          </div>
+          <p id="rk-studio">DANDON GAMES</p>
+          <p id="rk-error" hidden></p>
+          <button id="rk-retry" type="button" hidden>Retry</button>
+        </div>
       </div>
     </div>
     <p id="rk-build">Drag the ball and release. angle-20261017-0034</p>
@@ -120,6 +198,15 @@
     <script>
       (function () {
         var stage = document.getElementById("stage");
+        var canvas = document.getElementById("unity-canvas");
+        var loading = document.getElementById("rk-loading");
+        var fill = document.getElementById("rk-fill");
+        var bar = document.getElementById("rk-bar");
+        var status = document.getElementById("rk-status");
+        var errorText = document.getElementById("rk-error");
+        var retry = document.getElementById("rk-retry");
+        var booting = false;
+
         function block(event) {
           if (stage.contains(event.target)) event.preventDefault();
         }
@@ -129,27 +216,60 @@
         document.getElementById("rk-restart").addEventListener("click", function () {
           window.location.reload();
         });
+        retry.addEventListener("click", function () {
+          window.location.reload();
+        });
 
-        var started = performance.now();
-        var canvas = document.querySelector("#unity-canvas");
-        createUnityInstance(canvas, {
-          arguments: [],
-          dataUrl: "Build/angle-20261017-0034.data.unityweb?v=angle-20261017-0034",
-          frameworkUrl: "Build/angle-20261017-0034.framework.js.unityweb?v=angle-20261017-0034",
-          codeUrl: "Build/angle-20261017-0034.wasm.unityweb?v=angle-20261017-0034",
-          streamingAssetsUrl: "StreamingAssets",
-          companyName: "DefaultCompany",
-          productName: "Rounding Kick",
-          productVersion: "0.1.0",
-          devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2)
-        }, function (progress) {
-          var pct = Math.round(progress * 100);
-          document.getElementById("rk-fill").style.width = pct + "%";
-          document.getElementById("rk-pct").textContent = "Loading " + pct + "%";
-        }).then(function (unityInstance) {
-          document.getElementById("rk-loading").style.display = "none";
+        function setProgress(progress) {
+          if (typeof progress !== "number" || !isFinite(progress)) {
+            bar.classList.add("rk-wait");
+            status.textContent = "Starting game…";
+            return;
+          }
+          var clamped = Math.max(0, Math.min(1, progress));
+          if (clamped >= 1) {
+            bar.classList.add("rk-wait");
+            status.textContent = "Starting game…";
+            return;
+          }
+          bar.classList.remove("rk-wait");
+          var pct = Math.round(clamped * 100);
+          fill.style.width = pct + "%";
+          bar.setAttribute("aria-valuenow", String(pct));
+          status.textContent = "Loading…";
+        }
+
+        function showError(message) {
+          booting = false;
+          loading.classList.add("rk-failed");
+          loading.classList.remove("rk-hide");
+          loading.hidden = false;
+          loading.setAttribute("aria-busy", "false");
+          bar.classList.remove("rk-wait");
+          fill.style.width = "0%";
+          bar.setAttribute("aria-valuenow", "0");
+          status.textContent = "Could not load the game.";
+          errorText.hidden = false;
+          var detail = message ? String(message) : "";
+          if (!detail || detail.length > 90 || detail.indexOf("\n") >= 0)
+            detail = "Check the connection and try again.";
+          errorText.textContent = detail;
+          if (message) console.error(message);
+          retry.hidden = false;
+        }
+
+        function reveal(unityInstance) {
           window.rkUnity = unityInstance;
-          window.rkLoadMs = Math.round(performance.now() - started);
+          document.body.classList.add("rk-ready");
+          canvas.classList.remove("rk-pending");
+          loading.setAttribute("aria-busy", "false");
+          loading.classList.add("rk-hide");
+          window.setTimeout(function () {
+            loading.hidden = true;
+          }, 460);
+        }
+
+        function wireRelease(unityInstance) {
           function toUnity(touch) {
             var rect = canvas.getBoundingClientRect();
             if (!rect.width || !rect.height)
@@ -167,8 +287,6 @@
               unityInstance.SendMessage("AngleChallenge", "BrowserTouch", kind + ":" + changed[i].identifier + ":" + remaining + toUnity(changed[i]));
             }
           }
-          // Capture on the document so a finger that slides off the canvas still releases the shot.
-          // touchcancel is the same lift on phones: aiming up pulls the finger off the bottom edge.
           document.addEventListener("touchend", function (event) { notifyTouch("up", event); }, true);
           document.addEventListener("touchcancel", function (event) { notifyTouch("up", event); }, true);
           document.addEventListener("pointerup", function (event) {
@@ -181,9 +299,49 @@
               return;
             unityInstance.SendMessage("AngleChallenge", "BrowserTouch", "up:" + event.pointerId + ":0" + toUnity(event));
           }, true);
-        }).catch(function (message) {
-          document.getElementById("rk-pct").textContent = String(message);
-        });
+        }
+
+        function boot() {
+          if (booting || window.rkUnity)
+            return;
+          if (typeof createUnityInstance !== "function") {
+            showError("The game loader did not download.");
+            return;
+          }
+          booting = true;
+          loading.classList.remove("rk-failed");
+          retry.hidden = true;
+          errorText.hidden = true;
+          setProgress(0);
+          var started = performance.now();
+          var instance;
+          try {
+            instance = createUnityInstance(canvas, {
+            arguments: [],
+            dataUrl: "Build/angle-20261017-0034.data.unityweb?v=angle-20261017-0034",
+            frameworkUrl: "Build/angle-20261017-0034.framework.js.unityweb?v=angle-20261017-0034",
+            codeUrl: "Build/angle-20261017-0034.wasm.unityweb?v=angle-20261017-0034",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "DefaultCompany",
+            productName: "Rounding Kick",
+            productVersion: "0.1.0",
+            devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2)
+          }, function (progress) {
+            setProgress(progress);
+          }).then(function (unityInstance) {
+            window.rkLoadMs = Math.round(performance.now() - started);
+            wireRelease(unityInstance);
+            reveal(unityInstance);
+          }).catch(function (message) {
+            showError(message);
+          });
+          } catch (message) {
+            showError(message);
+            return;
+          }
+        }
+
+        boot();
       })();
     </script>
   </body>
