@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
     <title>Rounding Kick</title>
-    <link rel="preload" as="image" href="TemplateData/rk-loading-art.jpg?v=angle-20261017-2136">
+    <link rel="preload" as="image" href="TemplateData/rk-loading-hero.webp?v=angle-20261017-2215" type="image/webp">
     <style>
       html, body {
         margin: 0;
         width: 100%;
         height: 100%;
-        background: #0340CE;
+        background: #FEF7E5;
         overflow: hidden;
         overscroll-behavior: none;
       }
@@ -46,9 +46,7 @@
         position: absolute;
         inset: 0;
         z-index: 4;
-        display: flex;
-        flex-direction: column;
-        background: #ABC2D4;
+        background: #FEF7E5;
         overflow: hidden;
         opacity: 1;
         transition: opacity 0.45s ease;
@@ -61,91 +59,128 @@
         display: none !important;
         pointer-events: none;
       }
+      #rk-loading picture {
+        position: absolute;
+        inset: 0;
+      }
       #rk-art {
+        position: absolute;
+        inset: 0;
         display: block;
         width: 100%;
-        height: auto;
-        max-height: 89%;
+        height: 100%;
         object-fit: contain;
-        object-position: center bottom;
-        flex: 0 1 auto;
-        background: #0340CE;
+        object-position: center center;
+        background: #FEF7E5;
       }
-      #rk-loading.rk-failed #rk-art {
-        max-height: 74%;
-      }
-      #rk-load-ui {
-        flex: 1 1 auto;
+      #rk-copy, #rk-load-ui {
+        position: absolute;
+        left: 0;
+        right: 0;
+        z-index: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 0.65em;
-        min-height: 11%;
-        padding: 0 8% 2.2%;
         box-sizing: border-box;
-        background: #ABC2D4;
-        color: #C9A24A;
-        font-family: "Segoe UI", "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
+        pointer-events: none;
+        font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        color: #1B2A4A;
       }
-      #rk-status, #rk-studio, #rk-error {
+      #rk-copy {
+        top: 3.6%;
+        gap: 0.2em;
+        padding: 0 8%;
+      }
+      #rk-title, #rk-by, #rk-status, #rk-percent, #rk-error {
         margin: 0;
       }
+      #rk-title {
+        font-size: clamp(20px, 3.6vh, 40px);
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        line-height: 1;
+      }
+      #rk-by {
+        font-size: clamp(10px, 1.5vh, 14px);
+        font-weight: 700;
+        letter-spacing: 0.24em;
+      }
+      #rk-load-ui {
+        bottom: 2.4%;
+        gap: 0.45em;
+        padding: 0 10% 0.4%;
+      }
       #rk-status {
-        font-size: clamp(16px, 2.5vh, 22px);
-        font-weight: 600;
-        letter-spacing: 0.01em;
+        font-size: clamp(14px, 2vh, 20px);
+        font-weight: 700;
+      }
+      #rk-percent {
+        font-size: clamp(13px, 1.8vh, 18px);
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        min-height: 1.2em;
       }
       #rk-bar {
-        width: 40%;
-        min-width: 140px;
-        height: 14px;
+        width: min(78%, 320px);
+        height: 18px;
         box-sizing: border-box;
-        padding: 2px;
+        padding: 3px;
+        border: 2px solid #C6A15A;
         border-radius: 999px;
-        background: #C9A24A;
+        background: #FEF7E5;
       }
       #rk-track {
         height: 100%;
         border-radius: inherit;
         overflow: hidden;
-        background: #D7E7F0;
+        background: #E7F6EA;
       }
       #rk-fill {
         width: 0%;
         height: 100%;
         border-radius: inherit;
-        background: #7EFEFC;
+        background: linear-gradient(90deg, #1A4FDB, #2EC8C0);
+        transition: width 0.28s linear;
       }
       #rk-bar.rk-wait #rk-fill {
         width: 28%;
+        transition: none;
         animation: rk-indet 1.05s ease-in-out infinite;
       }
       @keyframes rk-indet {
         0% { transform: translateX(-140%); }
         100% { transform: translateX(400%); }
       }
-      #rk-studio {
-        font-size: clamp(11px, 1.55vh, 14px);
-        font-weight: 600;
-        letter-spacing: 0.26em;
-      }
       #rk-error {
         max-width: 18em;
-        color: #1C3358;
+        color: #1B2A4A;
         font-size: 13px;
         line-height: 1.35;
         text-align: center;
       }
       #rk-retry {
-        border: 0;
+        pointer-events: auto;
+        border: 2px solid #C6A15A;
         border-radius: 999px;
         min-height: 44px;
         padding: 0 18px;
-        background: #123A9A;
-        color: #F4EFE4;
-        font: 600 15px/1 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background: #1B2A4A;
+        color: #FEF7E5;
+        font: 700 15px/1 "Trebuchet MS", "Segoe UI", sans-serif;
         touch-action: manipulation;
+      }
+      @media (max-height: 640px) {
+        #rk-copy { top: 2%; }
+        #rk-load-ui { bottom: 1.4%; gap: 0.25em; }
+        #rk-bar { height: 14px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #rk-loading, #rk-fill { transition: none; }
+        #rk-bar.rk-wait #rk-fill {
+          animation: none;
+          width: 100%;
+          opacity: 0.55;
+        }
       }
       #rk-build {
         position: fixed;
@@ -181,22 +216,29 @@
   <body>
     <div id="stage">
       <canvas id="unity-canvas" width="1080" height="1920" tabindex="-1"></canvas>
-      <div id="rk-loading" role="status" aria-live="polite" aria-busy="true">
-        <img id="rk-art" src="TemplateData/rk-loading-art.jpg?v=angle-20261017-2136" alt="Rounding Kick">
+      <div id="rk-loading" aria-busy="true">
+        <picture>
+          <source srcset="TemplateData/rk-loading-hero.webp?v=angle-20261017-2215" type="image/webp">
+          <img id="rk-art" src="TemplateData/rk-loading-hero.jpg?v=angle-20261017-2215" alt="">
+        </picture>
+        <div id="rk-copy">
+          <p id="rk-title">ROUNDING KICK</p>
+          <p id="rk-by">BY DANDON GAMES</p>
+        </div>
         <div id="rk-load-ui">
-          <p id="rk-status">Loading…</p>
+          <p id="rk-status" role="status" aria-live="polite">Loading…</p>
           <div id="rk-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Loading">
             <div id="rk-track"><div id="rk-fill"></div></div>
           </div>
-          <p id="rk-studio">DANDON GAMES</p>
+          <p id="rk-percent" aria-hidden="true">0%</p>
           <p id="rk-error" hidden></p>
           <button id="rk-retry" type="button" hidden>Retry</button>
         </div>
       </div>
     </div>
-    <p id="rk-build">Drag the ball and release. angle-20261017-2136</p>
+    <p id="rk-build">Drag the ball and release. angle-20261017-2215</p>
     <button id="rk-restart" type="button">Reload</button>
-    <script src="Build/angle-20261017-2136.loader.js?v=angle-20261017-2136"></script>
+    <script src="Build/angle-20261017-2215.loader.js?v=angle-20261017-2215"></script>
     <script>
       (function () {
         var stage = document.getElementById("stage");
@@ -205,6 +247,7 @@
         var fill = document.getElementById("rk-fill");
         var bar = document.getElementById("rk-bar");
         var status = document.getElementById("rk-status");
+        var percent = document.getElementById("rk-percent");
         var errorText = document.getElementById("rk-error");
         var retry = document.getElementById("rk-retry");
         var booting = false;
@@ -223,22 +266,22 @@
         });
 
         function setProgress(progress) {
-          if (typeof progress !== "number" || !isFinite(progress)) {
+          if (typeof progress !== "number" || !isFinite(progress) || progress >= 1) {
             bar.classList.add("rk-wait");
-            status.textContent = "Starting game…";
-            return;
-          }
-          var clamped = Math.max(0, Math.min(1, progress));
-          if (clamped >= 1) {
-            bar.classList.add("rk-wait");
-            status.textContent = "Starting game…";
+            bar.removeAttribute("aria-valuenow");
+            bar.setAttribute("aria-valuetext", "Preparing the court");
+            percent.textContent = "";
+            status.textContent = "Preparing the court…";
             return;
           }
           bar.classList.remove("rk-wait");
-          var pct = Math.round(clamped * 100);
+          bar.removeAttribute("aria-valuetext");
+          var pct = Math.round(Math.max(0, progress) * 100);
           fill.style.width = pct + "%";
           bar.setAttribute("aria-valuenow", String(pct));
-          status.textContent = "Loading…";
+          percent.textContent = pct + "%";
+          if (status.textContent !== "Loading…")
+            status.textContent = "Loading…";
         }
 
         function showError(message) {
@@ -250,6 +293,8 @@
           bar.classList.remove("rk-wait");
           fill.style.width = "0%";
           bar.setAttribute("aria-valuenow", "0");
+          bar.removeAttribute("aria-valuetext");
+          percent.textContent = "";
           status.textContent = "Could not load the game.";
           errorText.hidden = false;
           var detail = message ? String(message) : "";
@@ -264,6 +309,7 @@
           window.rkUnity = unityInstance;
           document.body.classList.add("rk-ready");
           loading.setAttribute("aria-busy", "false");
+          loading.setAttribute("aria-hidden", "true");
           loading.classList.add("rk-hide");
           window.setTimeout(function () {
             loading.hidden = true;
@@ -319,9 +365,9 @@
           try {
             instance = createUnityInstance(canvas, {
             arguments: [],
-            dataUrl: "Build/angle-20261017-2136.data.unityweb?v=angle-20261017-2136",
-            frameworkUrl: "Build/angle-20261017-2136.framework.js.unityweb?v=angle-20261017-2136",
-            codeUrl: "Build/angle-20261017-2136.wasm.unityweb?v=angle-20261017-2136",
+            dataUrl: "Build/angle-20261017-2215.data.unityweb?v=angle-20261017-2215",
+            frameworkUrl: "Build/angle-20261017-2215.framework.js.unityweb?v=angle-20261017-2215",
+            codeUrl: "Build/angle-20261017-2215.wasm.unityweb?v=angle-20261017-2215",
             streamingAssetsUrl: "StreamingAssets",
             companyName: "DefaultCompany",
             productName: "Rounding Kick",
