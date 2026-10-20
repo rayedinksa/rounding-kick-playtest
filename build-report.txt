@@ -1,13 +1,13 @@
-buildId=angle-20261020-2317
+buildId=angle-20261021-0221
 scene=Assets/_Game/Scenes/AngleChallenge.unity
 originalTarget=iOS
 webgl template=PROJECT:RKPortrait compression=Brotli fallback=True memory=256 threads=False
 result=Succeeded
-errors=0
+errors=1
 warnings=401
-sizeBytes=39148769
-duration=00:06:17.6294688
-output=C:/Users/PCD/Rounding Kick/Builds/WebPlaytest/angle-20261020-2317
+sizeBytes=43733142
+duration=00:04:49.3106300
+output=C:/Users/PCD/Rounding Kick/Builds/WebPlaytest/angle-20261021-0221
 switched=True active=iOS
 ios-restored backend=IL2CPP arch=1 orientation=Portrait targetOs=15.0 bundle=com.raedalharbi.roundingkick autoGraphics=True activeTarget=iOS
 ios-after-playtest orientation=Portrait targetOs=15.0 bundle=com.raedalharbi.roundingkick activeTarget=iOS
