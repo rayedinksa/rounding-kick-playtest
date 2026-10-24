@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
     <title>Rounding Kick</title>
-    <link rel="preload" as="image" href="TemplateData/rk-loading-hero.webp?v=angle-20261024-2305" type="image/webp">
+    <link rel="preload" as="image" href="TemplateData/rk-loading-hero.webp?v=angle-20261024-2334" type="image/webp">
     <style>
       html, body {
         margin: 0;
@@ -218,8 +218,8 @@
       <canvas id="unity-canvas" width="1080" height="1920" tabindex="-1"></canvas>
       <div id="rk-loading" aria-busy="true">
         <picture>
-          <source srcset="TemplateData/rk-loading-hero.webp?v=angle-20261024-2305" type="image/webp">
-          <img id="rk-art" src="TemplateData/rk-loading-hero.jpg?v=angle-20261024-2305" alt="">
+          <source srcset="TemplateData/rk-loading-hero.webp?v=angle-20261024-2334" type="image/webp">
+          <img id="rk-art" src="TemplateData/rk-loading-hero.jpg?v=angle-20261024-2334" alt="">
         </picture>
         <div id="rk-copy">
           <p id="rk-title">ROUNDING KICK</p>
@@ -237,7 +237,25 @@
       </div>
     </div>
     <button id="rk-restart" type="button">Reload</button>
-    <script src="Build/angle-20261024-2305.loader.js?v=angle-20261024-2305"></script>
+    <script>
+      (function () {
+        var NativeAudio = window.AudioContext || window.webkitAudioContext;
+        if (!NativeAudio)
+          return;
+        var contexts = [];
+        function PatchedAudio() {
+          var context = new NativeAudio();
+          contexts.push(context);
+          return context;
+        }
+        PatchedAudio.prototype = NativeAudio.prototype;
+        window.AudioContext = PatchedAudio;
+        if (window.webkitAudioContext)
+          window.webkitAudioContext = PatchedAudio;
+        window.rkAudioContexts = contexts;
+      })();
+    </script>
+    <script src="Build/angle-20261024-2334.loader.js?v=angle-20261024-2334"></script>
     <script>
       (function () {
         var stage = document.getElementById("stage");
@@ -257,6 +275,17 @@
         document.addEventListener("touchmove", block, { passive: false });
         document.addEventListener("wheel", block, { passive: false });
         stage.addEventListener("gesturestart", block, { passive: false });
+        function unlockAudio() {
+          var list = window.rkAudioContexts || [];
+          for (var i = 0; i < list.length; i++) {
+            var context = list[i];
+            if (context && context.state === "suspended" && context.resume)
+              context.resume();
+          }
+        }
+        document.addEventListener("pointerdown", unlockAudio, true);
+        document.addEventListener("touchstart", unlockAudio, true);
+        document.addEventListener("keydown", unlockAudio, true);
         document.getElementById("rk-restart").addEventListener("click", function () {
           window.location.reload();
         });
@@ -364,9 +393,9 @@
           try {
             instance = createUnityInstance(canvas, {
             arguments: [],
-            dataUrl: "Build/angle-20261024-2305.data.unityweb?v=angle-20261024-2305",
-            frameworkUrl: "Build/angle-20261024-2305.framework.js.unityweb?v=angle-20261024-2305",
-            codeUrl: "Build/angle-20261024-2305.wasm.unityweb?v=angle-20261024-2305",
+            dataUrl: "Build/angle-20261024-2334.data.unityweb?v=angle-20261024-2334",
+            frameworkUrl: "Build/angle-20261024-2334.framework.js.unityweb?v=angle-20261024-2334",
+            codeUrl: "Build/angle-20261024-2334.wasm.unityweb?v=angle-20261024-2334",
             streamingAssetsUrl: "StreamingAssets",
             companyName: "DefaultCompany",
             productName: "Rounding Kick",
